@@ -25,7 +25,7 @@ const AppToolbar: FC = () => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Placeholder title
+            fdmngr-client
           </Typography>
           <Button color="inherit">Login</Button>
         </Toolbar>

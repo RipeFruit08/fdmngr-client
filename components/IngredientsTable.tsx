@@ -53,7 +53,7 @@ const IngredientsTable: FC<IngredientsTableProps> = ({}) => {
     const desc = makeid(20);
     const quantity = getRandomInt(0, 20);
     const payload = { name, description: desc, quantity };
-    await fetch("http://localhost:3002/ingredient", {
+    await fetch("http://localhost:3002/ingredients", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -67,60 +67,19 @@ const IngredientsTable: FC<IngredientsTableProps> = ({}) => {
       .catch((error) => {
         console.error("error posting");
       });
-    setLoading(true);
     mutate();
   };
   const [rows, setRows] = useState([]);
-  const [totalRows, setTotalRows] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [paginationModel, setPaginationModel] = useState({
-    page: 0,
-    pageSize: 3,
-  });
-
-  useEffect(() => {
-    const fetcher = async () => {
-      // fetch data from server
-      const data = await fetch(
-        `http://localhost:3002/ingredients/pagination?page=${paginationModel.page}&pageSize=${paginationModel.pageSize}`,
-        {
-          method: "GET",
-        }
-      ).then((res) => {
-        return res.json();
-      });
-      setRows(data.data);
-      setTotalRows(data.rowCount);
-    };
-    setLoading(true);
-    fetcher();
-    setLoading(false);
-  }, [paginationModel, loading]);
 
   const { data, error, isLoading, mutate } = useSWR(
-    `http://localhost:3002/ingredients/pagination?page=${paginationModel.page}&pageSize=${paginationModel.pageSize}`,
+    `http://localhost:3002/ingredients/`,
     fetcher
   );
-
-  const rowCountRef = useRef(data?.rowCount || 0);
-
-  const rowCount = useMemo(() => {
-    if (data?.rowCount !== undefined) {
-      rowCountRef.current = data.rowCount;
-    }
-    return rowCountRef.current;
-  }, [data?.rowCount]);
 
   return (
     <Box sx={{ height: 400, width: "100%" }}>
       <DataGrid
-        // using useEffect
-        // rows={rows}
-        // rowCount={totalRows}
-        // loading={loading}
-        // using swr
-        rows={data?.data ?? []}
-        rowCount={rowCount}
+        rows={data ?? []}
         loading={isLoading}
         columns={columns}
         initialState={{
@@ -133,9 +92,6 @@ const IngredientsTable: FC<IngredientsTableProps> = ({}) => {
         pageSizeOptions={[3, 5, 10, 50]}
         disableRowSelectionOnClick
         pagination
-        paginationMode="server"
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
       />
       <Button onClick={buttonHandler}>Post</Button>
     </Box>
